@@ -4,17 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Текущее состояние проекта
 
-Это **пустой шаблон Unity URP**, а не работающая кодовая база. На данный момент в `Assets/` лежат только:
+Это **шаблон Unity URP с установленным DI-контейнером**, а не работающая кодовая база. Содержимое `Assets/`:
 
 - `Assets/Scenes/SampleScene.unity` — стандартная сцена шаблона (Main Camera, Directional Light, Global Volume), единственная сцена в Build Settings;
 - `Assets/Settings/` — три URP-профиля качества (`URP-Performant`, `URP-Balanced`, `URP-HighFidelity`) с соответствующими Renderer-ассетами;
-- `Assets/UniversalRenderPipelineGlobalSettings.asset`.
+- `Assets/UniversalRenderPipelineGlobalSettings.asset`;
+- `Assets/Plugins/Zenject/` — DI-фреймворк (сторонний код, ~1.7 тыс. файлов); подробности в разделе «DI-контейнер» ниже.
 
-**Скриптов (`.cs`), asmdef-файлов и тестов в проекте нет.** Название `MaterialAccumulationDemo` отражает замысел, но механика накопления материалов ещё не реализована — не предполагай наличие соответствующей архитектуры, её нужно спроектировать с нуля.
+**Собственного игрового кода пока нет** — все присутствующие `.cs` и `.asmdef` принадлежат Zenject. Название `MaterialAccumulationDemo` отражает замысел, но механика накопления материалов ещё не реализована — не предполагай наличие соответствующей архитектуры, её нужно спроектировать с нуля.
 
 Следствие: `Assembly-CSharp.csproj` устарел — он содержит ссылку на удалённый `Assets\TutorialInfo\Scripts\Readme.cs`. Файлы `.csproj`/`.sln` генерируются Unity, править их вручную не нужно; они перегенерируются после добавления первого скрипта.
 
 ## Git: свой репозиторий, вложенный в чужой
+
+**`git push` — только по явной команде пользователя.** Не отправляй изменения в `origin` по собственной инициативе: ни когда задача выглядит законченной, ни когда «логично сразу запушить», ни после успешной проверки. Локальные коммиты в рамках задачи допустимы, публикация — нет. Если считаешь, что пора отправлять, скажи об этом и дождись ответа. Команда — это прямая просьба вида «запушь», «отправь», «push»; согласие на пуш в одной задаче не переносится на следующую.
 
 У проекта есть собственный репозиторий: **https://github.com/NickZubkov/MaterialAccumulationDemo** (приватный), ветка `main`, `origin` настроен, рабочее дерево отслеживает `origin/main`. В корне лежит `.gitignore` для Unity — `Library/`, `Temp/`, `Logs/`, `UserSettings/`, а также генерируемые `*.csproj`/`*.sln` исключены.
 
@@ -28,6 +31,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Родительский репозиторий видит проект как одну untracked-запись `MaterialAccumulationDemo/` и внутрь не заходит. Добавлять её туда не нужно — это продублирует проект как gitlink.
 - В родительском репозитории `.gitignore` по-прежнему отсутствует, а его `Library/`-папки весят гигабайты. Никогда не выполняй `git add .` или `git add -A`, находясь в `D:\UnityProjects`.
 
+## DI-контейнер: Zenject (Extenject) 9.2.0
+
+Установлен в `Assets/Plugins/Zenject/` из `.unitypackage`, **не через Package Manager** — в `Packages/manifest.json` его нет. Следствие: обновление только ручным переимпортом, и вся папка лежит в репозитории (~24 МБ).
+
+Формально это **Extenject** — актуальный форк Zenject: `package.json` объявляет `com.mathijsbakker.extenject`. Namespace и имя папки остались `Zenject`, но при поиске документации и issue имеет смысл учитывать оба названия.
+
+Сборки (asmdef), на которые можно ссылаться из своего кода:
+
+| Сборка | Назначение |
+|---|---|
+| `Zenject` | рантайм-ядро (`Assets/Plugins/Zenject/zenject.asmdef`) |
+| `Zenject-Editor` | редакторная часть, только Editor |
+| `Zenject-TestFramework` | база для тестов с контейнером |
+
+Собственный код по умолчанию попадает в `Assembly-CSharp`, которая видит `Zenject` автоматически. Но как только заведёшь свой asmdef, добавь в него ссылку на `Zenject` явно — иначе типы не разрешатся.
+
+Точки входа фреймворка: `ProjectContext` (глобальный контейнер, префаб в `Resources`), `SceneContext` (контейнер сцены), `MonoInstaller` / `ScriptableObjectInstaller` (регистрация биндингов).
+
+**Текущее состояние интеграции: нулевое.** В `SampleScene` нет `SceneContext`, инсталлеров не написано, `ProjectContext` не создан. Zenject лежит в проекте, но ни к чему не подключён — при добавлении первой механики контейнер нужно поднимать с нуля.
+
+`OptionalExtras/` — примеры, интеграционные тесты, `AutoMocking`, `ReflectionBaking`, `MemoryPoolMonitor`. Составляют основную часть объёма папки и для работы ядра не требуются; если решишь удалить, проверь, что ничего не ссылается на `Zenject-TestFramework`.
+
 ## Конфигурация
 
 | Параметр | Значение |
@@ -40,7 +65,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 На машине стоят и другие версии редактора (2019.1.0f1, 2020.3.48f1, 2021.3.33f1, 2022.3.62f1/f2, 6000.3.19f1) — открывать проект нужно именно **2022.3.62f3**, иначе Unity предложит апгрейд и перезапишет ассеты.
 
-Подключён `com.unity.test-framework` 1.1.33, но тестовых сборок нет. Чтобы тесты заработали, потребуется создать asmdef с ссылками на `UnityEngine.TestRunner` / `UnityEditor.TestRunner` (обычно через Window → General → Test Runner → Create Test Assembly Folder).
+Подключён `com.unity.test-framework` 1.1.33. Собственных тестов нет, но Zenject приносит свои сборки (`Zenject-UnitTests-Editor`, `Zenject-IntegrationTests`), поэтому Test Runner не пуст — не принимай эти тесты за тесты проекта. Для своих тестов создай отдельный asmdef со ссылками на `UnityEngine.TestRunner` / `UnityEditor.TestRunner` (Window → General → Test Runner → Create Test Assembly Folder).
 
 ## Команды
 
@@ -54,7 +79,7 @@ Unity не имеет отдельного шага «сборки» для ра
   -logFile "$env:TEMP\unity_compile.log"
 ```
 
-Прогон тестов (после того как тестовые сборки появятся):
+Прогон тестов:
 
 ```powershell
 & "C:\Program Files\Unity\Hub\Editor\2022.3.62f3\Editor\Unity.exe" -runTests -batchmode -nographics `
