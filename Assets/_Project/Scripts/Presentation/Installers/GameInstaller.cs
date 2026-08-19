@@ -16,20 +16,35 @@ namespace MaterialAccumulation.Presentation.Installers
 
         public override void InstallBindings()
         {
+            BindInput();
+            BindSurface();
+            BindZone();
+        }
+
+        private void BindInput()
+        {
+            Container.BindInterfacesAndSelfTo<LegacyInputSource>().AsSingle();
+        }
+
+        private void BindSurface()
+        {
             Container.BindInterfacesAndSelfTo<ManagedDepositionProcessor>().AsSingle();
             Container.BindInterfacesAndSelfTo<SurfaceService>().AsSingle();
-
-            Container.BindInterfacesAndSelfTo<LegacyInputSource>().AsSingle();
-            Container.BindInterfacesAndSelfTo<CurveRadiusModulator>().AsSingle();
-            Container.BindInterfacesAndSelfTo<ZoneMotionService>().AsSingle();
 
             Container.BindFactory<MeshSurfaceView, SurfaceViewFactory>()
                 .FromComponentInNewPrefab(_surfaceViewPrefab);
 
+            Container.BindInterfacesAndSelfTo<SurfacePresenter>().AsSingle();
+        }
+
+        private void BindZone()
+        {
+            Container.BindInterfacesAndSelfTo<CurveRadiusModulator>().AsSingle();
+            Container.BindInterfacesAndSelfTo<ZoneMotionService>().AsSingle();
+
             Container.BindFactory<ZoneMarkerView, ZoneMarkerViewFactory>()
                 .FromComponentInNewPrefab(_zoneMarkerPrefab);
 
-            Container.BindInterfacesAndSelfTo<SurfacePresenter>().AsSingle();
             Container.BindInterfacesAndSelfTo<ZonePresenter>().AsSingle();
         }
     }
