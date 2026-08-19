@@ -1,4 +1,5 @@
 using MaterialAccumulation.Core.Configuration;
+using MaterialAccumulation.Core.Grid;
 using MaterialAccumulation.Core.Surface;
 using Unity.Collections;
 using UnityEngine;
@@ -62,7 +63,7 @@ namespace MaterialAccumulation.Presentation.Surface
         private void BuildMesh()
         {
             int resolution = _geometry.Resolution;
-            int vertexCount = _geometry.VertexCount;
+            int vertexCount = _geometry.VertexCount();
             int quadCount = (resolution - 1) * (resolution - 1);
             int indexCount = quadCount * 6;
 

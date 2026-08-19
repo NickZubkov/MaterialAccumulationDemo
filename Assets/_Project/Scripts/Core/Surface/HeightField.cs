@@ -1,5 +1,6 @@
 ﻿using System;
 using MaterialAccumulation.Core.Configuration;
+using MaterialAccumulation.Core.Grid;
 using Unity.Collections;
 
 namespace MaterialAccumulation.Core.Surface
@@ -31,7 +32,7 @@ namespace MaterialAccumulation.Core.Surface
         public HeightField(SurfaceSettings settings)
         {
             _geometry = new GridGeometry(settings.Resolution, settings.Size);
-            _heights = new NativeArray<float>(_geometry.VertexCount, Allocator.Persistent);
+            _heights = new NativeArray<float>(_geometry.VertexCount(), Allocator.Persistent);
             MarkAllDirty();
         }
 
@@ -41,11 +42,9 @@ namespace MaterialAccumulation.Core.Surface
                 _heights.Dispose();
         }
 
-        public int ToIndex(int x, int z) => z * _geometry.Resolution + x;
-
         public void MarkDirty(in CellRegion region)
         {
-            if (region.IsEmpty)
+            if (region.IsEmpty())
                 return;
 
             _dirtyRegion = _isDirty ? _dirtyRegion.Union(region) : region;

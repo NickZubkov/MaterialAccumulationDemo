@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using MaterialAccumulation.Core.Grid;
+using Unity.Collections;
 
 namespace MaterialAccumulation.Core.Surface
 {
