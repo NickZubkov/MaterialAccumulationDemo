@@ -39,6 +39,7 @@ ExportedObj/
 *.mdb.meta
 
 # ---- Build artifacts ----
+/Builds/
 *.apk
 *.aab
 *.unitypackage
