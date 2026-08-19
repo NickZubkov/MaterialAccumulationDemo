@@ -1,0 +1,11 @@
+{
+    "name": "MaterialAccumulation.Presentation",
+    "rootNamespace": "MaterialAccumulation.Presentation",
+    "references": ["MaterialAccumulation.Core", "Zenject", "Unity.TextMeshPro"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "autoReferenced": true,
+    "noEngineReferences": false
+}
