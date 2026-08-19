@@ -91,7 +91,7 @@ namespace MaterialAccumulation.Presentation.Surface
             CellRegion expanded = region.Expand(1, _geometry);
 
             int resolution = _geometry.Resolution;
-            float doubleCell = 2f * _geometry.CellSize;
+            float cellSize = _geometry.CellSize;
             NativeArray<float> heights = _surface.Heights;
 
             for (int z = expanded.MinZ; z <= expanded.MaxZ; z++)
@@ -110,13 +110,15 @@ namespace MaterialAccumulation.Presentation.Surface
                     float heightDown = heights[down * resolution + x];
                     float heightUp = heights[up * resolution + x];
 
+                    // Центральные разности по полю высот. Пролёт берётся фактический:
+                    // на кромке ClampCell схлопывает соседа на саму вершину, и деление
+                    // на две клетки занизило бы там наклон вдвое.
+                    float slopeX = (heightLeft - heightRight) / ((right - left) * cellSize);
+                    float slopeZ = (heightDown - heightUp) / ((up - down) * cellSize);
+
                     var vertex = _vertices[index];
                     vertex.Position.y = heights[index];
-                    // Центральные разности по полю высот.
-                    vertex.Normal = new Vector3(
-                        heightLeft - heightRight,
-                        doubleCell,
-                        heightDown - heightUp).normalized;
+                    vertex.Normal = new Vector3(slopeX, 1f, slopeZ).normalized;
                     _vertices[index] = vertex;
                 }
             }

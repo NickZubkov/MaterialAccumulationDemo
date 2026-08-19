@@ -27,6 +27,7 @@ namespace MaterialAccumulation.Presentation.Hud
         private IHudView _view;
         private float _smoothedFrameRate;
         private int _limitIndex;
+        private int _originalVSyncCount;
 
         public HudPresenter(
             IZoneStateProvider zone,
@@ -42,6 +43,8 @@ namespace MaterialAccumulation.Presentation.Hud
 
         public void Initialize()
         {
+            _originalVSyncCount = QualitySettings.vSyncCount;
+
             _view = _viewFactory.Create();
             _view.ResetRequested += OnResetRequested;
             _view.FrameRateLimitRequested += OnFrameRateLimitRequested;
@@ -51,18 +54,20 @@ namespace MaterialAccumulation.Presentation.Hud
 
         public void Dispose()
         {
-            if (_view == null)
-                return;
-
-            _view.ResetRequested -= OnResetRequested;
-            _view.FrameRateLimitRequested -= OnFrameRateLimitRequested;
+            if (_view != null)
+            {
+                _view.ResetRequested -= OnResetRequested;
+                _view.FrameRateLimitRequested -= OnFrameRateLimitRequested;
+                _view.Dispose();
+            }
 
             // targetFrameRate и vSyncCount глобальны и переживают выход из Play Mode:
-            // не вернув их, редактор останется зажатым до перезапуска.
-            _limitIndex = 0;
-            ApplyFrameRateLimit();
-
-            _view.Dispose();
+            // не вернув их, редактор останется зажатым до перезапуска. Возвращаем их
+            // напрямую, а не через ApplyFrameRateLimit: вью к этому моменту может быть
+            // уже уничтожен, а исключение отсюда Zenject пробрасывает наружу и обрывает
+            // обход — сервисы с меньшим приоритетом не освободили бы Persistent-буферы.
+            QualitySettings.vSyncCount = _originalVSyncCount;
+            Application.targetFrameRate = -1;
         }
 
         public void Tick()
@@ -93,8 +98,10 @@ namespace MaterialAccumulation.Presentation.Hud
         {
             int limit = FrameRateLimits[_limitIndex];
 
-            // При включённом vSync targetFrameRate игнорируется.
-            QualitySettings.vSyncCount = limit > 0 ? 0 : 1;
+            // При включённом vSync targetFrameRate игнорируется. Режим «без ограничения»
+            // возвращает то значение, что стояло в профиле качества, а не жёсткую единицу:
+            // в редакторе правка QualitySettings оседает в ассете проекта.
+            QualitySettings.vSyncCount = limit > 0 ? 0 : _originalVSyncCount;
             Application.targetFrameRate = limit > 0 ? limit : -1;
 
             _view.SetFrameRateLimit(limit);
