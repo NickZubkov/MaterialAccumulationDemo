@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace MaterialAccumulation.Presentation.Hud
@@ -53,8 +54,26 @@ namespace MaterialAccumulation.Presentation.Hud
                 _frameRateLimitLabel.SetText("Limit: off");
         }
 
-        private void RaiseResetRequested() => ResetRequested?.Invoke();
+        private void RaiseResetRequested()
+        {
+            Deselect();
+            ResetRequested?.Invoke();
+        }
 
-        private void RaiseFrameRateLimitRequested() => FrameRateLimitRequested?.Invoke();
+        private void RaiseFrameRateLimitRequested()
+        {
+            Deselect();
+            FrameRateLimitRequested?.Invoke();
+        }
+
+        /// <summary>
+        /// Ось Submit в Input Manager привязана в том числе к пробелу, а им наносится
+        /// материал: оставшаяся выделенной кнопка срабатывала бы на каждое нанесение.
+        /// </summary>
+        private void Deselect()
+        {
+            if (EventSystem.current != null)
+                EventSystem.current.SetSelectedGameObject(null);
+        }
     }
 }
