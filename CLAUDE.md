@@ -14,16 +14,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Следствие: `Assembly-CSharp.csproj` устарел — он содержит ссылку на удалённый `Assets\TutorialInfo\Scripts\Readme.cs`. Файлы `.csproj`/`.sln` генерируются Unity, править их вручную не нужно; они перегенерируются после добавления первого скрипта.
 
-## Git: репозиторий — родительская папка
+## Git: свой репозиторий, вложенный в чужой
 
-Критично для любых операций с git. Корень репозитория — не этот проект, а `D:\UnityProjects`, где рядом лежат десятки других Unity-проектов (`Forest`, `CrazyPawns`, `Excavator`, `MergeMechanicDemo` и т. д.).
+У проекта есть собственный репозиторий: **https://github.com/NickZubkov/MaterialAccumulationDemo** (приватный), ветка `main`, `origin` настроен, рабочее дерево отслеживает `origin/main`. В корне лежит `.gitignore` для Unity — `Library/`, `Temp/`, `Logs/`, `UserSettings/`, а также генерируемые `*.csproj`/`*.sln` исключены.
 
-- `MaterialAccumulationDemo` **полностью не отслеживается** git (0 файлов в индексе).
-- **В репозитории нет ни одного `.gitignore`.** При этом `Library/` в этом проекте занимает ~1.9 ГБ, `Logs/` — ~1.4 МБ.
+Важная особенность: папка проекта физически лежит **внутри другого git-репозитория** — `D:\UnityProjects`, где рядом расположены десятки посторонних Unity-проектов (`Forest`, `CrazyPawns`, `Excavator` и др.). Это два независимых репозитория, вложенных друг в друга.
 
-Поэтому: никогда не выполняй `git add .` или `git add -A` — это затянет в индекс гигабайты генерируемых Unity папок (`Library/`, `Temp/`, `Logs/`, `obj/`) сразу по нескольким проектам. Добавляй только конкретные пути внутри `Assets/`, `Packages/`, `ProjectSettings/`. Если проект нужно поставить под контроль версий — сначала заведи `.gitignore` для Unity.
+Из-за этого:
 
-`git status` из этой директории показывает изменения по всем соседним проектам; фильтруй вывод путём (`git status MaterialAccumulationDemo`).
+- Перед любой git-операцией убедись, в каком репозитории находишься: `git rev-parse --show-toplevel`. Из директории проекта должно возвращаться `D:/UnityProjects/MaterialAccumulationDemo`, а не `D:/UnityProjects`.
+- Родительский репозиторий видит проект как одну untracked-запись `MaterialAccumulationDemo/` и внутрь не заходит. Добавлять её туда не нужно — это продублирует проект как gitlink.
+- В родительском репозитории `.gitignore` по-прежнему отсутствует, а его `Library/`-папки весят гигабайты. Никогда не выполняй `git add .` или `git add -A`, находясь в `D:\UnityProjects`.
 
 ## Конфигурация
 
