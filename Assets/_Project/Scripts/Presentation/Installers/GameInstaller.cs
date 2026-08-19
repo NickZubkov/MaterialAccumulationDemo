@@ -37,10 +37,10 @@ namespace MaterialAccumulation.Presentation.Installers
             Container.BindInterfacesAndSelfTo<ManagedDepositionProcessor>().AsSingle();
             Container.BindInterfacesAndSelfTo<SurfaceService>().AsSingle();
 
-            Container.BindFactory<MeshSurfaceView, SurfaceViewFactory>()
-                .FromComponentInNewPrefab(_surfaceViewPrefab);
-
-            Container.Bind<IViewFactory<ISurfaceView>>().To<SurfaceViewFactory>().FromResolve();
+            Container.Bind<IViewFactory<ISurfaceView>>()
+                .To<PrefabViewFactory<ISurfaceView, MeshSurfaceView>>()
+                .AsSingle()
+                .WithArguments(_surfaceViewPrefab);
 
             Container.BindInterfacesAndSelfTo<SurfacePresenter>().AsSingle();
         }
@@ -50,10 +50,10 @@ namespace MaterialAccumulation.Presentation.Installers
             Container.BindInterfacesAndSelfTo<CurveRadiusModulator>().AsSingle();
             Container.BindInterfacesAndSelfTo<ZoneMotionService>().AsSingle();
 
-            Container.BindFactory<ZoneMarkerView, ZoneMarkerViewFactory>()
-                .FromComponentInNewPrefab(_zoneMarkerPrefab);
-
-            Container.Bind<IViewFactory<IZoneMarkerView>>().To<ZoneMarkerViewFactory>().FromResolve();
+            Container.Bind<IViewFactory<IZoneMarkerView>>()
+                .To<PrefabViewFactory<IZoneMarkerView, ZoneMarkerView>>()
+                .AsSingle()
+                .WithArguments(_zoneMarkerPrefab);
 
             Container.BindInterfacesAndSelfTo<ZonePresenter>().AsSingle();
         }
@@ -65,10 +65,10 @@ namespace MaterialAccumulation.Presentation.Installers
 
         private void BindHud()
         {
-            Container.BindFactory<HudView, HudViewFactory>()
-                .FromComponentInNewPrefab(_hudPrefab);
-
-            Container.Bind<IViewFactory<IHudView>>().To<HudViewFactory>().FromResolve();
+            Container.Bind<IViewFactory<IHudView>>()
+                .To<PrefabViewFactory<IHudView, HudView>>()
+                .AsSingle()
+                .WithArguments(_hudPrefab);
 
             Container.BindInterfacesAndSelfTo<HudPresenter>().AsSingle();
         }
