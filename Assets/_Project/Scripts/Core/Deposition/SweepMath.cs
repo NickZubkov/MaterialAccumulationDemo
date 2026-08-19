@@ -4,8 +4,8 @@ using UnityEngine;
 namespace MaterialAccumulation.Core.Deposition
 {
     /// <summary>
-    /// Геометрия свипа. Вынесена отдельно, чтобы managed- и Burst-реализации
-    /// считали по одним и тем же формулам.
+    /// Геометрия свипа. Вынесена отдельно от обхода: способ перебора ячеек
+    /// может смениться — на джоб или на другой процессор, — а формулы останутся одни.
     /// </summary>
     public static class SweepMath
     {
