@@ -12,7 +12,10 @@ namespace MaterialAccumulation.Core.Zone
     {
         private readonly ZoneSettings _settings;
 
-        public CurveRadiusModulator(ZoneSettings settings) => _settings = settings;
+        public CurveRadiusModulator(ZoneSettings settings)
+        {
+            _settings = settings;
+        }
 
         public float Evaluate(float time)
         {

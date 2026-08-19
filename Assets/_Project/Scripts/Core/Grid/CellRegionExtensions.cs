@@ -12,18 +12,22 @@
         public static bool IsEmpty(this in CellRegion region) =>
             region.MaxX < region.MinX || region.MaxZ < region.MinZ;
 
-        public static CellRegion Expand(this in CellRegion region, int margin, in GridGeometry geometry) =>
-            new CellRegion(
+        public static CellRegion Expand(this in CellRegion region, int margin, in GridGeometry geometry)
+        {
+            return new CellRegion(
                 geometry.ClampCell(region.MinX - margin),
                 geometry.ClampCell(region.MinZ - margin),
                 geometry.ClampCell(region.MaxX + margin),
                 geometry.ClampCell(region.MaxZ + margin));
+        }
 
-        public static CellRegion Union(this in CellRegion region, in CellRegion other) =>
-            new CellRegion(
+        public static CellRegion Union(this in CellRegion region, in CellRegion other)
+        {
+            return new CellRegion(
                 region.MinX < other.MinX ? region.MinX : other.MinX,
                 region.MinZ < other.MinZ ? region.MinZ : other.MinZ,
                 region.MaxX > other.MaxX ? region.MaxX : other.MaxX,
                 region.MaxZ > other.MaxZ ? region.MaxZ : other.MaxZ);
+        }
     }
 }

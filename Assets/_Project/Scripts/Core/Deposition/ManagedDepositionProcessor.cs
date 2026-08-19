@@ -15,7 +15,10 @@ namespace MaterialAccumulation.Core.Deposition
     {
         private readonly ZoneSettings _settings;
 
-        public ManagedDepositionProcessor(ZoneSettings settings) => _settings = settings;
+        public ManagedDepositionProcessor(ZoneSettings settings)
+        {
+            _settings = settings;
+        }
 
         public bool Apply(
             NativeArray<float> heights,
