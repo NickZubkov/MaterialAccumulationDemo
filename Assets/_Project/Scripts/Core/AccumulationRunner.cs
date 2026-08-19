@@ -14,6 +14,11 @@ namespace MaterialAccumulation.Core
     /// </summary>
     public sealed class AccumulationRunner : ITickable
     {
+        /// <summary>Предельная длина подшага как доля радиуса зоны.</summary>
+        private const float SubstepRadiusFraction = 0.05f;
+
+        private const int MaxSubsteps = 16;
+
         private readonly IInputSource _input;
         private readonly ZoneMotionService _zone;
         private readonly ISurfaceDepositor _surface;
@@ -53,11 +58,41 @@ namespace MaterialAccumulation.Core
                 Vector2 from = _wasDepositing ? previousPosition : _zone.Position;
                 float radiusFrom = _wasDepositing ? previousRadius : _zone.Radius;
 
-                var stroke = new DepositionStroke(from, _zone.Position, radiusFrom, _zone.Radius, deltaTime);
-                _surface.Deposit(stroke);
+                Deposit(from, _zone.Position, radiusFrom, _zone.Radius, deltaTime);
             }
 
             _wasDepositing = depositing;
+        }
+
+        private void Deposit(Vector2 from, Vector2 to, float radiusFrom, float radiusTo, float deltaTime)
+        {
+            // Потолок высоты применяется раз на свип и берётся как максимум по всей его
+            // длине, поэтому длинный свип обрезает накопление слабее короткого — итог
+            // поехал бы вслед за частотой кадров. Дробление на подшаги фиксированной
+            // длины делает шаг интегрирования независимым от deltaTime.
+            float maxStep = Mathf.Max(radiusFrom, radiusTo) * SubstepRadiusFraction;
+            int steps = 1;
+
+            if (maxStep > 0f)
+                steps = Mathf.Clamp(Mathf.CeilToInt(Vector2.Distance(from, to) / maxStep), 1, MaxSubsteps);
+
+            float stepTime = deltaTime / steps;
+            float inverseSteps = 1f / steps;
+
+            for (int i = 0; i < steps; i++)
+            {
+                float start = i * inverseSteps;
+                float end = (i + 1) * inverseSteps;
+
+                var stroke = new DepositionStroke(
+                    Vector2.Lerp(from, to, start),
+                    Vector2.Lerp(from, to, end),
+                    Mathf.Lerp(radiusFrom, radiusTo, start),
+                    Mathf.Lerp(radiusFrom, radiusTo, end),
+                    stepTime);
+
+                _surface.Deposit(stroke);
+            }
         }
     }
 }
