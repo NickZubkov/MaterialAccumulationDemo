@@ -1,6 +1,5 @@
 ﻿using MaterialAccumulation.Core.Configuration;
 using MaterialAccumulation.Core.Grid;
-using MaterialAccumulation.Core.Surface;
 using UnityEngine;
 
 namespace MaterialAccumulation.Core.Zone
@@ -14,18 +13,18 @@ namespace MaterialAccumulation.Core.Zone
     {
         private readonly ZoneSettings _settings;
         private readonly IRadiusModulator _modulator;
-        private readonly GridGeometry _geometry;
+        private readonly IPlanarBounds _bounds;
 
         private float _time;
 
         public Vector2 Position { get; private set; }
         public float Radius { get; private set; }
 
-        public ZoneMotionService(ZoneSettings settings, IRadiusModulator modulator, ISurfaceReader field)
+        public ZoneMotionService(ZoneSettings settings, IRadiusModulator modulator, IPlanarBounds bounds)
         {
             _settings = settings;
             _modulator = modulator;
-            _geometry = field.Geometry;
+            _bounds = bounds;
             Radius = _modulator.Evaluate(0f);
         }
 
@@ -34,7 +33,7 @@ namespace MaterialAccumulation.Core.Zone
             _time += deltaTime;
 
             // Клампим позицию границами поля, чтобы AABB свипа не выходил за массив.
-            Position = _geometry.ClampToBounds(Position + move * (_settings.MoveSpeed * deltaTime));
+            Position = _bounds.Clamp(Position + move * (_settings.MoveSpeed * deltaTime));
             Radius = _modulator.Evaluate(_time);
         }
     }

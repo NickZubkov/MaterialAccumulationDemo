@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using MaterialAccumulation.Core.Configuration;
 using MaterialAccumulation.Core.Grid;
 using MaterialAccumulation.Core.Surface;
@@ -15,7 +15,7 @@ namespace MaterialAccumulation.Presentation.Surface
     public sealed class SurfacePresenter : IInitializable, ITickable, IDisposable
     {
         private readonly ISurfaceReader _surface;
-        private readonly SurfaceSettings _settings;
+        private readonly ZoneSettings _zoneSettings;
         private readonly SurfaceViewFactory _viewFactory;
 
         private ISurfaceView _view;
@@ -23,10 +23,10 @@ namespace MaterialAccumulation.Presentation.Surface
         private NativeArray<SurfaceVertex> _vertices;
         private GridGeometry _geometry;
 
-        public SurfacePresenter(ISurfaceReader surface, SurfaceSettings settings, SurfaceViewFactory viewFactory)
+        public SurfacePresenter(ISurfaceReader surface, ZoneSettings zoneSettings, SurfaceViewFactory viewFactory)
         {
             _surface = surface;
-            _settings = settings;
+            _zoneSettings = zoneSettings;
             _viewFactory = viewFactory;
         }
 
@@ -36,7 +36,11 @@ namespace MaterialAccumulation.Presentation.Surface
             _vertices = new NativeArray<SurfaceVertex>(_geometry.VertexCount(), Allocator.Persistent);
             WriteFlatGrid();
 
-            _mesh = SurfaceMeshFactory.Create(_geometry, _settings);
+            // Материал не может подняться выше потолка купола, а тот равен радиусу зоны:
+            // предельная высота выводится из настроек зоны, а не задаётся отдельным полем,
+            // которое пришлось бы держать согласованным вручную.
+            float maxHeight = _zoneSettings.BaseRadius + _zoneSettings.RadiusAmplitude;
+            _mesh = SurfaceMeshFactory.Create(_geometry, maxHeight);
 
             _view = _viewFactory.Create();
             _view.SetMesh(_mesh);
@@ -92,7 +96,7 @@ namespace MaterialAccumulation.Presentation.Surface
 
             int resolution = _geometry.Resolution;
             float cellSize = _geometry.CellSize;
-            NativeArray<float> heights = _surface.Heights;
+            NativeArray<float>.ReadOnly heights = _surface.Heights;
 
             for (int z = expanded.MinZ; z <= expanded.MaxZ; z++)
             {

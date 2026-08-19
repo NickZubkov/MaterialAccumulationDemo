@@ -14,4 +14,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _size: 20
   _resolution: 256
-  _maxHeight: 3

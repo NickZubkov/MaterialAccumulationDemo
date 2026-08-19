@@ -7,7 +7,7 @@ namespace MaterialAccumulation.Core.Surface
     public interface ISurfaceReader
     {
         public GridGeometry Geometry { get; }
-        public NativeArray<float> Heights { get; }
+        public NativeArray<float>.ReadOnly Heights { get; }
         public bool IsDirty { get; }
         public CellRegion DirtyRegion { get; }
 

@@ -3,6 +3,7 @@ using MaterialAccumulation.Core.Configuration;
 using MaterialAccumulation.Core.Deposition;
 using MaterialAccumulation.Core.Grid;
 using Unity.Collections;
+using UnityEngine;
 
 namespace MaterialAccumulation.Core.Surface
 {
@@ -11,7 +12,7 @@ namespace MaterialAccumulation.Core.Surface
     /// на чтение, наносит свипы и отслеживает грязный регион. Буфер выделяется
     /// один раз и живёт до разрушения контейнера.
     /// </summary>
-    public sealed class SurfaceService : ISurfaceReader, ISurfaceResetter, ISurfaceDepositor, IDisposable
+    public sealed class SurfaceService : ISurfaceReader, ISurfaceResetter, ISurfaceDepositor, IPlanarBounds, IDisposable
     {
         private readonly GridGeometry _geometry;
         private readonly IDepositionProcessor _processor;
@@ -21,7 +22,7 @@ namespace MaterialAccumulation.Core.Surface
         private bool _isDirty;
 
         public GridGeometry Geometry => _geometry;
-        public NativeArray<float> Heights => _heights;
+        public NativeArray<float>.ReadOnly Heights => _heights.AsReadOnly();
         public bool IsDirty => _isDirty;
         public CellRegion DirtyRegion => _dirtyRegion;
 
@@ -44,6 +45,8 @@ namespace MaterialAccumulation.Core.Surface
             if (_processor.Apply(_heights, _geometry, stroke, out CellRegion touched))
                 MarkDirty(touched);
         }
+
+        public Vector2 Clamp(Vector2 position) => _geometry.ClampToBounds(position);
 
         public void ClearDirty() => _isDirty = false;
 

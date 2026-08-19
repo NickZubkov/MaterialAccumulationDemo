@@ -1,5 +1,4 @@
-using MaterialAccumulation.Core.Configuration;
-using MaterialAccumulation.Core.Grid;
+﻿using MaterialAccumulation.Core.Grid;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -9,7 +8,7 @@ namespace MaterialAccumulation.Presentation.Surface
     /// <summary>Сборка меша поверхности. Топология строится один раз и дальше не меняется.</summary>
     public static class SurfaceMeshFactory
     {
-        public static Mesh Create(in GridGeometry geometry, SurfaceSettings settings)
+        public static Mesh Create(in GridGeometry geometry, float maxHeight)
         {
             int resolution = geometry.Resolution;
             int quadCount = (resolution - 1) * (resolution - 1);
@@ -65,8 +64,8 @@ namespace MaterialAccumulation.Presentation.Surface
             // Bounds задаются вручную — обязательное условие при DontRecalculateBounds,
             // иначе поверхность пропадает при frustum culling.
             mesh.bounds = new Bounds(
-                new Vector3(0f, settings.MaxHeight * 0.5f, 0f),
-                new Vector3(geometry.Size, settings.MaxHeight, geometry.Size));
+                new Vector3(0f, maxHeight * 0.5f, 0f),
+                new Vector3(geometry.Size, maxHeight, geometry.Size));
 
             return mesh;
         }
