@@ -6,22 +6,22 @@ namespace MaterialAccumulation.Core.Configuration
     public sealed class ZoneSettings : ScriptableObject
     {
         [SerializeField, Tooltip("Скорость перемещения зоны, м/с.")]
-        float _moveSpeed = 4f;
+        private float _moveSpeed = 4f;
 
         [SerializeField, Tooltip("Базовый радиус полусферы, м.")]
-        float _baseRadius = 1f;
+        private float _baseRadius = 1f;
 
         [SerializeField, Tooltip("Амплитуда изменения радиуса, м. Умножается на значение кривой.")]
-        float _radiusAmplitude = 0.5f;
+        private float _radiusAmplitude = 0.5f;
 
         [SerializeField, Tooltip("Частота цикла изменения радиуса, Гц.")]
-        float _radiusFrequency = 0.5f;
+        private float _radiusFrequency = 0.5f;
 
         [SerializeField, Tooltip("Форма цикла радиуса. Нормирована на [0,1] по обеим осям.")]
-        AnimationCurve _radiusCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+        private AnimationCurve _radiusCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
         [SerializeField, Tooltip("Скорость накопления материала, м/с.")]
-        float _accumulationRate = 1.5f;
+        private float _accumulationRate = 1.5f;
 
         public float MoveSpeed => _moveSpeed;
         public float BaseRadius => _baseRadius;

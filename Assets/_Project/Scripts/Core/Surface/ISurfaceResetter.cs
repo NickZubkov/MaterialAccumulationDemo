@@ -2,6 +2,6 @@
 {
     public interface ISurfaceResetter
     {
-        void Reset();
+        public void Reset();
     }
 }

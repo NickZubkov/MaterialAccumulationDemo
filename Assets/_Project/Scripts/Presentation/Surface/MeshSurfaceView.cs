@@ -14,20 +14,20 @@ namespace MaterialAccumulation.Presentation.Surface
     [RequireComponent(typeof(MeshFilter))]
     public sealed class MeshSurfaceView : MonoBehaviour, IInitializable, ITickable, System.IDisposable
     {
-        const MeshUpdateFlags UpdateFlags =
+        private const MeshUpdateFlags UpdateFlags =
             MeshUpdateFlags.DontRecalculateBounds |
             MeshUpdateFlags.DontValidateIndices |
             MeshUpdateFlags.DontNotifyMeshUsers;
 
-        IHeightFieldReader _field;
-        SurfaceSettings _settings;
+        private IHeightFieldReader _field;
+        private SurfaceSettings _settings;
 
-        Mesh _mesh;
-        NativeArray<SurfaceVertex> _vertices;
-        GridGeometry _geometry;
+        private Mesh _mesh;
+        private NativeArray<SurfaceVertex> _vertices;
+        private GridGeometry _geometry;
 
         [Inject]
-        void Construct(IHeightFieldReader field, SurfaceSettings settings)
+        private void Construct(IHeightFieldReader field, SurfaceSettings settings)
         {
             _field = field;
             _settings = settings;
@@ -41,15 +41,6 @@ namespace MaterialAccumulation.Presentation.Surface
             _field.ClearDirty();
         }
 
-        public void Tick()
-        {
-            if (!_field.IsDirty)
-                return;
-
-            UpdateRegion(_field.DirtyRegion);
-            _field.ClearDirty();
-        }
-
         public void Dispose()
         {
             if (_vertices.IsCreated)
@@ -59,7 +50,16 @@ namespace MaterialAccumulation.Presentation.Surface
                 Destroy(_mesh);
         }
 
-        void BuildMesh()
+        public void Tick()
+        {
+            if (!_field.IsDirty)
+                return;
+
+            UpdateRegion(_field.DirtyRegion);
+            _field.ClearDirty();
+        }
+
+        private void BuildMesh()
         {
             int resolution = _geometry.Resolution;
             int vertexCount = _geometry.VertexCount;
@@ -138,7 +138,7 @@ namespace MaterialAccumulation.Presentation.Surface
             }
         }
 
-        void UpdateRegion(in CellRegion region)
+        private void UpdateRegion(in CellRegion region)
         {
             // Нормаль краевой ячейки зависит от соседей за границей правки,
             // поэтому пересчитываем на одну ячейку шире.

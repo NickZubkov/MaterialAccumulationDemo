@@ -7,8 +7,8 @@ namespace MaterialAccumulation.Presentation.Installers
     [CreateAssetMenu(fileName = "SettingsInstaller", menuName = "MaterialAccumulation/Settings Installer")]
     public sealed class SettingsInstaller : ScriptableObjectInstaller<SettingsInstaller>
     {
-        [SerializeField] SurfaceSettings _surfaceSettings;
-        [SerializeField] ZoneSettings _zoneSettings;
+        [SerializeField] private SurfaceSettings _surfaceSettings;
+        [SerializeField] private ZoneSettings _zoneSettings;
 
         public override void InstallBindings()
         {

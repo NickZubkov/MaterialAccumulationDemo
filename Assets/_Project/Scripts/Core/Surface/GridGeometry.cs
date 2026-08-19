@@ -12,7 +12,9 @@ namespace MaterialAccumulation.Core.Surface
         public readonly float Size;
         public readonly float CellSize;
 
-        readonly float _half;
+        private readonly float _half;
+
+        public int VertexCount => Resolution * Resolution;
 
         public GridGeometry(int resolution, float size)
         {
@@ -21,8 +23,6 @@ namespace MaterialAccumulation.Core.Surface
             CellSize = size / (resolution - 1);
             _half = size * 0.5f;
         }
-
-        public int VertexCount => Resolution * Resolution;
 
         public float CellToWorldX(int x) => -_half + x * CellSize;
         public float CellToWorldZ(int z) => -_half + z * CellSize;

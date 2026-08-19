@@ -11,18 +11,11 @@ namespace MaterialAccumulation.Core.Surface
     /// </summary>
     public sealed class HeightField : IHeightFieldReader, ISurfaceResetter, IDisposable
     {
-        readonly GridGeometry _geometry;
+        private readonly GridGeometry _geometry;
 
-        NativeArray<float> _heights;
-        CellRegion _dirtyRegion;
-        bool _isDirty;
-
-        public HeightField(SurfaceSettings settings)
-        {
-            _geometry = new GridGeometry(settings.Resolution, settings.Size);
-            _heights = new NativeArray<float>(_geometry.VertexCount, Allocator.Persistent);
-            MarkAllDirty();
-        }
+        private NativeArray<float> _heights;
+        private CellRegion _dirtyRegion;
+        private bool _isDirty;
 
         public GridGeometry Geometry => _geometry;
         public NativeArray<float> Heights => _heights;
@@ -33,6 +26,19 @@ namespace MaterialAccumulation.Core.Surface
         {
             get => _heights[index];
             set => _heights[index] = value;
+        }
+
+        public HeightField(SurfaceSettings settings)
+        {
+            _geometry = new GridGeometry(settings.Resolution, settings.Size);
+            _heights = new NativeArray<float>(_geometry.VertexCount, Allocator.Persistent);
+            MarkAllDirty();
+        }
+
+        public void Dispose()
+        {
+            if (_heights.IsCreated)
+                _heights.Dispose();
         }
 
         public int ToIndex(int x, int z) => z * _geometry.Resolution + x;
@@ -56,13 +62,7 @@ namespace MaterialAccumulation.Core.Surface
             MarkAllDirty();
         }
 
-        public void Dispose()
-        {
-            if (_heights.IsCreated)
-                _heights.Dispose();
-        }
-
-        void MarkAllDirty()
+        private void MarkAllDirty()
         {
             int last = _geometry.Resolution - 1;
             _dirtyRegion = new CellRegion(0, 0, last, last);

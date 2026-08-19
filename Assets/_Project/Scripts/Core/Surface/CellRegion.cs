@@ -8,6 +8,11 @@
         public readonly int MaxX;
         public readonly int MaxZ;
 
+        public int Width => MaxX - MinX + 1;
+        public int Height => MaxZ - MinZ + 1;
+        public int CellCount => Width * Height;
+        public bool IsEmpty => MaxX < MinX || MaxZ < MinZ;
+
         public CellRegion(int minX, int minZ, int maxX, int maxZ)
         {
             MinX = minX;
@@ -15,11 +20,6 @@
             MaxX = maxX;
             MaxZ = maxZ;
         }
-
-        public int Width => MaxX - MinX + 1;
-        public int Height => MaxZ - MinZ + 1;
-        public int CellCount => Width * Height;
-        public bool IsEmpty => MaxX < MinX || MaxZ < MinZ;
 
         public CellRegion Expand(int margin, in GridGeometry geometry) => new CellRegion(
             geometry.ClampCell(MinX - margin),

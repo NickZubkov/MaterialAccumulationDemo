@@ -4,12 +4,12 @@ namespace MaterialAccumulation.Core.Surface
 {
     public interface IHeightFieldReader
     {
-        GridGeometry Geometry { get; }
-        NativeArray<float> Heights { get; }
-        bool IsDirty { get; }
-        CellRegion DirtyRegion { get; }
+        public GridGeometry Geometry { get; }
+        public NativeArray<float> Heights { get; }
+        public bool IsDirty { get; }
+        public CellRegion DirtyRegion { get; }
 
         /// <summary>Вызывается потребителем после того, как грязный регион отрисован.</summary>
-        void ClearDirty();
+        public void ClearDirty();
     }
 }
