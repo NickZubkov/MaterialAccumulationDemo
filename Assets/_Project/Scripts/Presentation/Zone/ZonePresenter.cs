@@ -9,11 +9,11 @@ namespace MaterialAccumulation.Presentation.Zone
     public sealed class ZonePresenter : IInitializable, ITickable, IDisposable
     {
         private readonly IZoneStateProvider _zone;
-        private readonly ZoneMarkerViewFactory _viewFactory;
+        private readonly IViewFactory<IZoneMarkerView> _viewFactory;
 
         private IZoneMarkerView _view;
 
-        public ZonePresenter(IZoneStateProvider zone, ZoneMarkerViewFactory viewFactory)
+        public ZonePresenter(IZoneStateProvider zone, IViewFactory<IZoneMarkerView> viewFactory)
         {
             _zone = zone;
             _viewFactory = viewFactory;

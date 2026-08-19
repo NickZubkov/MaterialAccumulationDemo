@@ -9,7 +9,7 @@ namespace MaterialAccumulation.Core.Zone
     /// продвижением управляет AccumulationRunner, которому нужно
     /// предыдущее состояние зоны для построения свипа.
     /// </summary>
-    public sealed class ZoneMotionService : IZoneStateProvider
+    public sealed class ZoneMotionService : IZoneStateProvider, IZoneMotion
     {
         private readonly ZoneSettings _settings;
         private readonly IRadiusModulator _modulator;

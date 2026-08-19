@@ -12,7 +12,8 @@ namespace MaterialAccumulation.Core.Surface
     /// на чтение, наносит свипы и отслеживает грязный регион. Буфер выделяется
     /// один раз и живёт до разрушения контейнера.
     /// </summary>
-    public sealed class SurfaceService : ISurfaceReader, ISurfaceResetter, ISurfaceDepositor, IPlanarBounds, IDisposable
+    public sealed class SurfaceService :
+        ISurfaceReader, ISurfaceDirtyRegion, ISurfaceResetter, ISurfaceDepositor, IPlanarBounds, IDisposable
     {
         private readonly GridGeometry _geometry;
         private readonly IDepositionProcessor _processor;
@@ -24,7 +25,7 @@ namespace MaterialAccumulation.Core.Surface
         public GridGeometry Geometry => _geometry;
         public NativeArray<float>.ReadOnly Heights => _heights.AsReadOnly();
         public bool IsDirty => _isDirty;
-        public CellRegion DirtyRegion => _dirtyRegion;
+        public CellRegion Region => _dirtyRegion;
 
         public SurfaceService(SurfaceSettings settings, IDepositionProcessor processor)
         {
@@ -48,7 +49,7 @@ namespace MaterialAccumulation.Core.Surface
 
         public Vector2 Clamp(Vector2 position) => _geometry.ClampToBounds(position);
 
-        public void ClearDirty() => _isDirty = false;
+        public void Clear() => _isDirty = false;
 
         public void Reset()
         {

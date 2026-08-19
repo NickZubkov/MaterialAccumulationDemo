@@ -22,7 +22,7 @@ namespace MaterialAccumulation.Presentation.Hud
         private readonly IZoneStateProvider _zone;
         private readonly IInputSource _input;
         private readonly ISurfaceResetter _resetter;
-        private readonly HudViewFactory _viewFactory;
+        private readonly IViewFactory<IHudView> _viewFactory;
 
         private IHudView _view;
         private float _smoothedFrameRate;
@@ -33,7 +33,7 @@ namespace MaterialAccumulation.Presentation.Hud
             IZoneStateProvider zone,
             IInputSource input,
             ISurfaceResetter resetter,
-            HudViewFactory viewFactory)
+            IViewFactory<IHudView> viewFactory)
         {
             _zone = zone;
             _input = input;

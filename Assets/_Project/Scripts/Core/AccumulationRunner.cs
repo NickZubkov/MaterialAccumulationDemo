@@ -20,7 +20,8 @@ namespace MaterialAccumulation.Core
         private const int MaxSubsteps = 16;
 
         private readonly IInputSource _input;
-        private readonly ZoneMotionService _zone;
+        private readonly IZoneStateProvider _zoneState;
+        private readonly IZoneMotion _zoneMotion;
         private readonly ISurfaceDepositor _surface;
         private readonly ISurfaceResetter _resetter;
 
@@ -28,12 +29,14 @@ namespace MaterialAccumulation.Core
 
         public AccumulationRunner(
             IInputSource input,
-            ZoneMotionService zone,
+            IZoneStateProvider zoneState,
+            IZoneMotion zoneMotion,
             ISurfaceDepositor surface,
             ISurfaceResetter resetter)
         {
             _input = input;
-            _zone = zone;
+            _zoneState = zoneState;
+            _zoneMotion = zoneMotion;
             _surface = surface;
             _resetter = resetter;
         }
@@ -42,10 +45,10 @@ namespace MaterialAccumulation.Core
         {
             float deltaTime = Time.deltaTime;
 
-            Vector2 previousPosition = _zone.Position;
-            float previousRadius = _zone.Radius;
+            Vector2 previousPosition = _zoneState.Position;
+            float previousRadius = _zoneState.Radius;
 
-            _zone.Advance(_input.Move, deltaTime);
+            _zoneMotion.Advance(_input.Move, deltaTime);
 
             if (_input.ResetPressed)
                 _resetter.Reset();
@@ -55,10 +58,10 @@ namespace MaterialAccumulation.Core
             {
                 // В первый кадр нажатия свип вырожден: иначе система дорисовала бы след
                 // из точки, где зона была при выключенном накоплении.
-                Vector2 from = _wasDepositing ? previousPosition : _zone.Position;
-                float radiusFrom = _wasDepositing ? previousRadius : _zone.Radius;
+                Vector2 from = _wasDepositing ? previousPosition : _zoneState.Position;
+                float radiusFrom = _wasDepositing ? previousRadius : _zoneState.Radius;
 
-                Deposit(from, _zone.Position, radiusFrom, _zone.Radius, deltaTime);
+                Deposit(from, _zoneState.Position, radiusFrom, _zoneState.Radius, deltaTime);
             }
 
             _wasDepositing = depositing;

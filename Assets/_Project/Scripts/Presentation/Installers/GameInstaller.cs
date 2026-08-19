@@ -40,6 +40,8 @@ namespace MaterialAccumulation.Presentation.Installers
             Container.BindFactory<MeshSurfaceView, SurfaceViewFactory>()
                 .FromComponentInNewPrefab(_surfaceViewPrefab);
 
+            Container.Bind<IViewFactory<ISurfaceView>>().To<SurfaceViewFactory>().FromResolve();
+
             Container.BindInterfacesAndSelfTo<SurfacePresenter>().AsSingle();
         }
 
@@ -50,6 +52,8 @@ namespace MaterialAccumulation.Presentation.Installers
 
             Container.BindFactory<ZoneMarkerView, ZoneMarkerViewFactory>()
                 .FromComponentInNewPrefab(_zoneMarkerPrefab);
+
+            Container.Bind<IViewFactory<IZoneMarkerView>>().To<ZoneMarkerViewFactory>().FromResolve();
 
             Container.BindInterfacesAndSelfTo<ZonePresenter>().AsSingle();
         }
@@ -63,6 +67,8 @@ namespace MaterialAccumulation.Presentation.Installers
         {
             Container.BindFactory<HudView, HudViewFactory>()
                 .FromComponentInNewPrefab(_hudPrefab);
+
+            Container.Bind<IViewFactory<IHudView>>().To<HudViewFactory>().FromResolve();
 
             Container.BindInterfacesAndSelfTo<HudPresenter>().AsSingle();
         }

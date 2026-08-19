@@ -15,17 +15,23 @@ namespace MaterialAccumulation.Presentation.Surface
     public sealed class SurfacePresenter : IInitializable, ITickable, IDisposable
     {
         private readonly ISurfaceReader _surface;
+        private readonly ISurfaceDirtyRegion _dirty;
         private readonly ZoneSettings _zoneSettings;
-        private readonly SurfaceViewFactory _viewFactory;
+        private readonly IViewFactory<ISurfaceView> _viewFactory;
 
         private ISurfaceView _view;
         private Mesh _mesh;
         private NativeArray<SurfaceVertex> _vertices;
         private GridGeometry _geometry;
 
-        public SurfacePresenter(ISurfaceReader surface, ZoneSettings zoneSettings, SurfaceViewFactory viewFactory)
+        public SurfacePresenter(
+            ISurfaceReader surface,
+            ISurfaceDirtyRegion dirty,
+            ZoneSettings zoneSettings,
+            IViewFactory<ISurfaceView> viewFactory)
         {
             _surface = surface;
+            _dirty = dirty;
             _zoneSettings = zoneSettings;
             _viewFactory = viewFactory;
         }
@@ -45,8 +51,8 @@ namespace MaterialAccumulation.Presentation.Surface
             _view = _viewFactory.Create();
             _view.SetMesh(_mesh);
 
-            UpdateRegion(_surface.DirtyRegion);
-            _surface.ClearDirty();
+            UpdateRegion(_dirty.Region);
+            _dirty.Clear();
         }
 
         public void Dispose()
@@ -62,11 +68,11 @@ namespace MaterialAccumulation.Presentation.Surface
 
         public void Tick()
         {
-            if (!_surface.IsDirty)
+            if (!_dirty.IsDirty)
                 return;
 
-            UpdateRegion(_surface.DirtyRegion);
-            _surface.ClearDirty();
+            UpdateRegion(_dirty.Region);
+            _dirty.Clear();
         }
 
         private void WriteFlatGrid()
