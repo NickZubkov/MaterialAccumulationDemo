@@ -1,3 +1,4 @@
+using MaterialAccumulation.Core;
 using MaterialAccumulation.Core.Deposition;
 using MaterialAccumulation.Core.Input;
 using MaterialAccumulation.Core.Surface;
@@ -19,6 +20,8 @@ namespace MaterialAccumulation.Presentation.Installers
             BindInput();
             BindSurface();
             BindZone();
+            BindAccumulation();
+            BindTickOrder();
         }
 
         private void BindInput()
@@ -46,6 +49,21 @@ namespace MaterialAccumulation.Presentation.Installers
                 .FromComponentInNewPrefab(_zoneMarkerPrefab);
 
             Container.BindInterfacesAndSelfTo<ZonePresenter>().AsSingle();
+        }
+
+        private void BindAccumulation()
+        {
+            Container.BindInterfacesAndSelfTo<AccumulationRunner>().AsSingle();
+        }
+
+        private void BindTickOrder()
+        {
+            // Без явных приоритетов все тики получают 0 и идут в порядке биндингов:
+            // презентеры отрисовали бы состояние до того, как раннер его изменил.
+            Container.BindExecutionOrder<LegacyInputSource>(0);
+            Container.BindExecutionOrder<AccumulationRunner>(100);
+            Container.BindExecutionOrder<SurfacePresenter>(200);
+            Container.BindExecutionOrder<ZonePresenter>(200);
         }
     }
 }
