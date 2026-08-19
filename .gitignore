@@ -20,9 +20,9 @@
 ExportedObj/
 
 # ---- Auto-generated solution and project files ----
-*.csproj
-*.unityproj
-*.sln
+/*.csproj
+/*.unityproj
+/*.sln
 *.suo
 *.tmp
 *.user
