@@ -293,6 +293,8 @@ MonoBehaviour:
     type: 3}
   _zoneMarkerPrefab: {fileID: 3202477508726968343, guid: 9bfb0d0d0c779cc47ad067d47c903d7e,
     type: 3}
+  _hudPrefab: {fileID: 8983722312885874539, guid: d0aa41270c97153418243d78e8e25a46,
+    type: 3}
 --- !u!114 &338155571
 MonoBehaviour:
   m_ObjectHideFlags: 0

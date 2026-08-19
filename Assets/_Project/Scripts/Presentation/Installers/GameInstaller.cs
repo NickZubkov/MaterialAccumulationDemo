@@ -3,6 +3,7 @@ using MaterialAccumulation.Core.Deposition;
 using MaterialAccumulation.Core.Input;
 using MaterialAccumulation.Core.Surface;
 using MaterialAccumulation.Core.Zone;
+using MaterialAccumulation.Presentation.Hud;
 using MaterialAccumulation.Presentation.Surface;
 using MaterialAccumulation.Presentation.Zone;
 using UnityEngine;
@@ -14,6 +15,7 @@ namespace MaterialAccumulation.Presentation.Installers
     {
         [SerializeField] private MeshSurfaceView _surfaceViewPrefab;
         [SerializeField] private ZoneMarkerView _zoneMarkerPrefab;
+        [SerializeField] private HudView _hudPrefab;
 
         public override void InstallBindings()
         {
@@ -21,6 +23,7 @@ namespace MaterialAccumulation.Presentation.Installers
             BindSurface();
             BindZone();
             BindAccumulation();
+            BindHud();
             BindTickOrder();
         }
 
@@ -56,6 +59,14 @@ namespace MaterialAccumulation.Presentation.Installers
             Container.BindInterfacesAndSelfTo<AccumulationRunner>().AsSingle();
         }
 
+        private void BindHud()
+        {
+            Container.BindFactory<HudView, HudViewFactory>()
+                .FromComponentInNewPrefab(_hudPrefab);
+
+            Container.BindInterfacesAndSelfTo<HudPresenter>().AsSingle();
+        }
+
         private void BindTickOrder()
         {
             // Без явных приоритетов все тики получают 0 и идут в порядке биндингов:
@@ -64,6 +75,7 @@ namespace MaterialAccumulation.Presentation.Installers
             Container.BindExecutionOrder<AccumulationRunner>(100);
             Container.BindExecutionOrder<SurfacePresenter>(200);
             Container.BindExecutionOrder<ZonePresenter>(200);
+            Container.BindExecutionOrder<HudPresenter>(300);
         }
     }
 }
