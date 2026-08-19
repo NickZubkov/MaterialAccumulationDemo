@@ -291,6 +291,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _surfaceViewPrefab: {fileID: 7672725674423368042, guid: c05ee5f4766af284b925e21bf2962653,
     type: 3}
+  _zoneMarkerPrefab: {fileID: 3202477508726968343, guid: 9bfb0d0d0c779cc47ad067d47c903d7e,
+    type: 3}
 --- !u!114 &338155571
 MonoBehaviour:
   m_ObjectHideFlags: 0
