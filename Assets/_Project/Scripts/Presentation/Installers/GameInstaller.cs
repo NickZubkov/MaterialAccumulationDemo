@@ -1,3 +1,4 @@
+using MaterialAccumulation.Core.Deposition;
 using MaterialAccumulation.Core.Input;
 using MaterialAccumulation.Core.Surface;
 using MaterialAccumulation.Core.Zone;
@@ -15,6 +16,7 @@ namespace MaterialAccumulation.Presentation.Installers
 
         public override void InstallBindings()
         {
+            Container.BindInterfacesAndSelfTo<ManagedDepositionProcessor>().AsSingle();
             Container.BindInterfacesAndSelfTo<SurfaceService>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<LegacyInputSource>().AsSingle();

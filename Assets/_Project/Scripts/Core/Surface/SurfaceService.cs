@@ -1,5 +1,6 @@
 ﻿using System;
 using MaterialAccumulation.Core.Configuration;
+using MaterialAccumulation.Core.Deposition;
 using MaterialAccumulation.Core.Grid;
 using Unity.Collections;
 
@@ -7,12 +8,13 @@ namespace MaterialAccumulation.Core.Surface
 {
     /// <summary>
     /// Владелец состояния накопленного материала: создаёт буфер высот, отдаёт его
-    /// на чтение и отслеживает грязный регион. Буфер выделяется один раз
-    /// и живёт до разрушения контейнера.
+    /// на чтение, наносит свипы и отслеживает грязный регион. Буфер выделяется
+    /// один раз и живёт до разрушения контейнера.
     /// </summary>
-    public sealed class SurfaceService : ISurfaceReader, ISurfaceResetter, IDisposable
+    public sealed class SurfaceService : ISurfaceReader, ISurfaceResetter, ISurfaceDepositor, IDisposable
     {
         private readonly GridGeometry _geometry;
+        private readonly IDepositionProcessor _processor;
 
         private NativeArray<float> _heights;
         private CellRegion _dirtyRegion;
@@ -23,9 +25,10 @@ namespace MaterialAccumulation.Core.Surface
         public bool IsDirty => _isDirty;
         public CellRegion DirtyRegion => _dirtyRegion;
 
-        public SurfaceService(SurfaceSettings settings)
+        public SurfaceService(SurfaceSettings settings, IDepositionProcessor processor)
         {
             _geometry = new GridGeometry(settings.Resolution, settings.Size);
+            _processor = processor;
             _heights = new NativeArray<float>(_geometry.VertexCount(), Allocator.Persistent);
             MarkAllDirty();
         }
@@ -36,6 +39,12 @@ namespace MaterialAccumulation.Core.Surface
                 _heights.Dispose();
         }
 
+        public void Deposit(in DepositionStroke stroke)
+        {
+            if (_processor.Apply(_heights, _geometry, stroke, out CellRegion touched))
+                MarkDirty(touched);
+        }
+
         public void ClearDirty() => _isDirty = false;
 
         public void Reset()
@@ -44,6 +53,15 @@ namespace MaterialAccumulation.Core.Surface
                 _heights[i] = 0f;
 
             MarkAllDirty();
+        }
+
+        private void MarkDirty(in CellRegion region)
+        {
+            if (region.IsEmpty())
+                return;
+
+            _dirtyRegion = _isDirty ? _dirtyRegion.Union(region) : region;
+            _isDirty = true;
         }
 
         private void MarkAllDirty()
