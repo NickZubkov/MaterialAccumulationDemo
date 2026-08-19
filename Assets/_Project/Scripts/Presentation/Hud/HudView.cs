@@ -7,7 +7,9 @@ using UnityEngine.UI;
 namespace MaterialAccumulation.Presentation.Hud
 {
     /// <summary>
-    /// Форматирование идёт через TMP_Text.SetText: string.Format аллоцировал бы каждый кадр.
+    /// Форматирование идёт через TMP_Text.SetText: string.Format аллоцировал бы строку каждый кадр.
+    /// Замер в редакторе покажет обратное — там SetText под #if UNITY_EDITOR синхронизирует поле
+    /// m_text через new char[] и new string(), то есть две аллокации на вызов. В билде блока нет.
     /// </summary>
     public sealed class HudView : MonoBehaviour, IHudView
     {
