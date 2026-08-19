@@ -6,11 +6,11 @@ using Unity.Collections;
 namespace MaterialAccumulation.Core.Surface
 {
     /// <summary>
-    /// Состояние накопленного материала. Хранится независимо от отображающего Mesh:
-    /// вью читает поле, но поле ничего не знает о вью.
-    /// Буфер выделяется один раз и живёт до разрушения контейнера.
+    /// Владелец состояния накопленного материала: создаёт буфер высот, отдаёт его
+    /// на чтение и отслеживает грязный регион. Буфер выделяется один раз
+    /// и живёт до разрушения контейнера.
     /// </summary>
-    public sealed class HeightField : IHeightFieldReader, ISurfaceResetter, IDisposable
+    public sealed class SurfaceService : ISurfaceReader, ISurfaceResetter, IDisposable
     {
         private readonly GridGeometry _geometry;
 
@@ -23,13 +23,7 @@ namespace MaterialAccumulation.Core.Surface
         public bool IsDirty => _isDirty;
         public CellRegion DirtyRegion => _dirtyRegion;
 
-        public float this[int index]
-        {
-            get => _heights[index];
-            set => _heights[index] = value;
-        }
-
-        public HeightField(SurfaceSettings settings)
+        public SurfaceService(SurfaceSettings settings)
         {
             _geometry = new GridGeometry(settings.Resolution, settings.Size);
             _heights = new NativeArray<float>(_geometry.VertexCount(), Allocator.Persistent);
@@ -40,15 +34,6 @@ namespace MaterialAccumulation.Core.Surface
         {
             if (_heights.IsCreated)
                 _heights.Dispose();
-        }
-
-        public void MarkDirty(in CellRegion region)
-        {
-            if (region.IsEmpty())
-                return;
-
-            _dirtyRegion = _isDirty ? _dirtyRegion.Union(region) : region;
-            _isDirty = true;
         }
 
         public void ClearDirty() => _isDirty = false;

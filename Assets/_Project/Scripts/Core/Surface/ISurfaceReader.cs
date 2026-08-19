@@ -3,7 +3,8 @@ using Unity.Collections;
 
 namespace MaterialAccumulation.Core.Surface
 {
-    public interface IHeightFieldReader
+    /// <summary>Состояние поверхности на чтение. Запись идёт только через владельца.</summary>
+    public interface ISurfaceReader
     {
         public GridGeometry Geometry { get; }
         public NativeArray<float> Heights { get; }

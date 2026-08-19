@@ -8,7 +8,7 @@ namespace MaterialAccumulation.Presentation.Installers
     {
         public override void InstallBindings()
         {
-            Container.BindInterfacesAndSelfTo<HeightField>().AsSingle();
+            Container.BindInterfacesAndSelfTo<SurfaceService>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<MeshSurfaceView>()
                 .FromComponentInHierarchy()

@@ -20,7 +20,7 @@ namespace MaterialAccumulation.Presentation.Surface
             MeshUpdateFlags.DontValidateIndices |
             MeshUpdateFlags.DontNotifyMeshUsers;
 
-        private IHeightFieldReader _field;
+        private ISurfaceReader _field;
         private SurfaceSettings _settings;
 
         private Mesh _mesh;
@@ -28,7 +28,7 @@ namespace MaterialAccumulation.Presentation.Surface
         private GridGeometry _geometry;
 
         [Inject]
-        private void Construct(IHeightFieldReader field, SurfaceSettings settings)
+        private void Construct(ISurfaceReader field, SurfaceSettings settings)
         {
             _field = field;
             _settings = settings;
