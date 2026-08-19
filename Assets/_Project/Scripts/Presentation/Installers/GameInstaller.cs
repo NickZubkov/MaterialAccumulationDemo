@@ -18,7 +18,7 @@ namespace MaterialAccumulation.Presentation.Installers
             Container.BindInterfacesAndSelfTo<SurfaceService>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<LegacyInputSource>().AsSingle();
-            Container.Bind<IRadiusModulator>().To<CurveRadiusModulator>().AsSingle();
+            Container.BindInterfacesAndSelfTo<CurveRadiusModulator>().AsSingle();
             Container.BindInterfacesAndSelfTo<ZoneMotionService>().AsSingle();
 
             Container.BindFactory<MeshSurfaceView, SurfaceViewFactory>()
@@ -29,11 +29,6 @@ namespace MaterialAccumulation.Presentation.Installers
 
             Container.BindInterfacesAndSelfTo<SurfacePresenter>().AsSingle();
             Container.BindInterfacesAndSelfTo<ZonePresenter>().AsSingle();
-
-            // Порядок кадра задаётся явно: иначе вью отстаёт от состояния на кадр.
-            Container.BindExecutionOrder<LegacyInputSource>(0);
-            Container.BindExecutionOrder<SurfacePresenter>(200);
-            Container.BindExecutionOrder<ZonePresenter>(200);
         }
     }
 }
